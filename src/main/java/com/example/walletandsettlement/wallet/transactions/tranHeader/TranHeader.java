@@ -22,7 +22,7 @@ public class TranHeader {
     private Date postedDate;
     private Boolean isVerified;
     private Date verifiedDate;
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL)
     @JoinColumn(name = "tran_id")
     private List<PartTran> partTrans;
 }
