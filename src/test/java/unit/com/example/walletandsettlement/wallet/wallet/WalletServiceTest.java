@@ -2,6 +2,8 @@ package com.example.walletandsettlement.wallet.wallet;
 
 import com.example.walletandsettlement.data.TestData;
 import com.example.walletandsettlement.exceptions.NotFoundException;
+import com.example.walletandsettlement.rabbitmq.RabbitMQPublisher;
+import com.example.walletandsettlement.wallet.transactions.tranHeader.TranHeader;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -20,6 +22,8 @@ public class WalletServiceTest {
     private WalletService walletService;
     @Mock
     private WalletRepository walletRepository;
+    @Mock
+    private RabbitMQPublisher publisher;
 
     @Test
     void testTransact_HappyPath_ShouldReturnCustomerWallet() {
@@ -30,6 +34,7 @@ public class WalletServiceTest {
 
         when(walletRepository.findById(1L)).thenReturn(Optional.of(customerWallet));
         when(walletRepository.findByWalletName("CASH")).thenReturn(Optional.of(cashWallet));
+        doNothing().when(publisher).send(any(TranHeader.class));
 
         Wallet returned = walletService.transact(1, 100, false);
         assertEquals(WALLET_TYPE.CUSTOMER, returned.getWalletType());

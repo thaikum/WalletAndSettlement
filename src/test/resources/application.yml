@@ -1,0 +1,40 @@
+spring:
+  application:
+    name: WalletAndSettlement
+
+  sql:
+    init:
+      mode: always
+      platform: h2
+      continue-on-error: true
+
+  datasource:
+    url: jdbc:h2:mem:testdb;MODE=MariaDB
+    username: sa
+    password: password
+    driver-class-name: org.h2.Driver
+  jpa:
+    defer-datasource-initialization: true
+    hibernate:
+      ddl-auto: update
+
+  rabbitmq:
+    host: localhost
+    port: 5672
+    username: guest
+    password: guest
+
+
+server:
+  port: 8080
+
+files:
+  external-transaction-file-location: /home/thaiku/IdeaProjects/WalletAndSettlement/src/test/resources/files/files
+
+rabbitmq:
+  queue:
+    name: transactions
+  exchange:
+    name: transaction_exchange
+  routing:
+    key: txn

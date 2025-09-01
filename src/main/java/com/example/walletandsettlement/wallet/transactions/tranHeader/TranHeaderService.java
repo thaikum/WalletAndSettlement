@@ -8,11 +8,13 @@ import com.example.walletandsettlement.wallet.wallet.Wallet;
 import com.example.walletandsettlement.wallet.wallet.WalletRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class TranHeaderService {
@@ -30,6 +32,8 @@ public class TranHeaderService {
             }
             wallet.setBalance(wallet.getBalance() + (partTran.getTranType() == 'C' ? -partTran.getAmount() : partTran.getAmount()));
         }
+        log.info("Here I reached too");
+
         walletRepository.saveAll(tranHeader.getPartTrans().stream().map(PartTran::getWallet).toList());
         tranHeader.setIsVerified(true);
         tranHeader.setVerifiedDate(new Date());

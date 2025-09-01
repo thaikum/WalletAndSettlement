@@ -30,14 +30,69 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-//    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
+    developmentOnly 'org.springframework.boot:spring-boot-docker-compose'
     runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation 'org.springframework.amqp:spring-rabbit-test'
+    runtimeOnly 'com.h2database:h2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    testCompileOnly 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.testcontainers:testcontainers'
+    testImplementation 'org.testcontainers:junit-jupiter'
+    testImplementation 'org.testcontainers:rabbitmq'
 }
 
-tasks.named('test') {
+sourceSets {
+    test {
+        java.srcDirs = ['src/test/java/unit', 'src/test/java/integration']
+        resources.srcDirs = ['src/test/resources']
+    }
+}
+
+tasks.register('unitTest', Test) {
+    description = 'Runs unit tests'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
     useJUnitPlatform()
+
+    // Run only classes ending with *Test (exclude *IT, *IntegrationTest)
+    filter {
+        includeTestsMatching '*Test'
+        excludeTestsMatching '*IT'
+        excludeTestsMatching '*IntegrationTest'
+    }
+}
+
+tasks.register('integrationTest', Test) {
+    description = 'Runs integration tests'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.test.output.classesDirs
+    classpath = sourceSets.test.runtimeClasspath
+    useJUnitPlatform()
+    shouldRunAfter tasks.named('unitTest')
+
+    // Run only classes ending with *IT or *IntegrationTest
+    filter {
+        includeTestsMatching '*IT'
+        includeTestsMatching '*IntegrationTest'
+    }
+}
+
+test {
+    useJUnitPlatform()
+    // Default test task runs unit tests only (same pattern as unitTest for IDE/CI convenience)
+    filter {
+        includeTestsMatching '*Test'
+        excludeTestsMatching '*IT'
+        excludeTestsMatching '*IntegrationTest'
+    }
+}
+
+tasks.named('check') {
+    dependsOn 'test', 'integrationTest'
 }

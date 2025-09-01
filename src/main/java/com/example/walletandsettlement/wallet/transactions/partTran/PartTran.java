@@ -1,5 +1,6 @@
 package com.example.walletandsettlement.wallet.transactions.partTran;
 
+import com.example.walletandsettlement.wallet.transactions.tranHeader.TranHeader;
 import com.example.walletandsettlement.wallet.wallet.Wallet;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -20,4 +21,7 @@ public class PartTran {
     private Character tranType;
     @ManyToOne
     private Wallet wallet;
+    @ManyToOne
+    @JoinColumn(name = "tran_id")
+    private TranHeader tranHeader;
 }

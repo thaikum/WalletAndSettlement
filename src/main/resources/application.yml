@@ -2,28 +2,39 @@ spring:
   application:
     name: WalletAndSettlement
 
+  sql:
+    init:
+      mode: always
+      platform: mariadb
+      continue-on-error: true
 
   datasource:
-    url: jdbc:mariadb://localhost:3306/wallet_and_settlement?createDatabaseIfNotExist=true
-    username: root
-    password: fredsystem
+    url: ${DATABASE_URL}
+    username: ${DATABASE_USER}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
   jpa:
+    defer-datasource-initialization: true
     hibernate:
-      ddl-auto: update # or create, create-drop, none
-    show-sql: true
+      ddl-auto: update
+
   rabbitmq:
-    host: localhost
+    host: ${RABBITMQ_HOST}
     port: 5672
-    username: myuser
-    password: secret
+    username: ${RABBITMQ_USER}
+    password: ${RABBITMQ_PASSWORD}
+    listener:
+      simple:
+        retry:
+          enabled: false
+        default-requeue-rejected: false
 
 
 server:
   port: 8080
 
 files:
-  external-transaction-file-location: classpath:files
+  external-transaction-file-location: ${RESOURCES_DIR}/files
 
 rabbitmq:
   queue:

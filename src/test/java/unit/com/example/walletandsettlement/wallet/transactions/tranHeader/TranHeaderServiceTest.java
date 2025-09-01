@@ -7,7 +7,6 @@ import com.example.walletandsettlement.wallet.transactions.partTran.PartTranRepo
 import com.example.walletandsettlement.wallet.wallet.WALLET_TYPE;
 import com.example.walletandsettlement.wallet.wallet.Wallet;
 import com.example.walletandsettlement.wallet.wallet.WalletRepository;
-import jakarta.servlet.http.Part;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,7 +14,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;

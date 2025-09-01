@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.io.IOException;
 import java.util.Date;
 
 @RestController
@@ -21,7 +22,7 @@ public class ReconciliationController {
       @RequestParam("date") @DateTimeFormat(pattern = "yyyy-MM-dd") Date date) {
     try {
       return ResponseEntity.ok(reconciliationService.reconcile(date));
-    } catch (Exception e) {
+    } catch (IOException e) {
       return ResponseEntity.badRequest().body(e.getMessage());
     }
   }

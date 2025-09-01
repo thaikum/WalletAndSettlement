@@ -1,0 +1,62 @@
+services:
+  app:
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+    image: openjdk:21-slim
+    volumes:
+      - ./build/libs/WalletAndSettlement-0.0.1-SNAPSHOT.jar:/app/app.jar:delegated
+      - ./src/main/resources:/app/resources:delegated
+    environment:
+      - DATABASE_URL=jdbc:mariadb://walletandsettlement-mariadb-1:3306/wallet_and_settlement?createDatabaseIfNotExist=true
+      - DATABASE_USER=wallet_user
+      - SPRING_SQL_INIT_LOCATION=file:/app/resources/
+      - DATABASE_PASSWORD=bT7p2Kj#9xF@qR5vZ8!nL
+      - RESOURCES_DIR=/app/resources
+      - RABBITMQ_HOST=walletandsettlement-rabbitmq-1
+      - RABBITMQ_USER=wallet_user
+      - RABBITMQ_PASSWORD=G7#rP9@kL4vZ2!mT6^xH8&jQ
+    command: java -jar /app/app.jar
+    ports:
+      - "8080:8080"
+
+  mariadb:
+    image: 'mariadb:latest'
+    environment:
+      - 'MARIADB_DATABASE=wallet_and_settlement'
+      - 'MARIADB_PASSWORD=bT7p2Kj#9xF@qR5vZ8!nL'
+      - 'MARIADB_ROOT_PASSWORD=P3^E7dQ@vX9kL2mN!8gH&r'
+      - 'MARIADB_USER=wallet_user'
+      - 'MARIADB_ROOT_HOST=%'
+    healthcheck:
+      test: [ "CMD-SHELL", "mariadb -h localhost -u$$MARIADB_USER -p$$MARIADB_PASSWORD -e 'SELECT 1;'" ]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 10s
+    ports:
+      - '11222:3306'
+    command: >
+      --character-set-server=utf8mb4 
+      --collation-server=utf8mb4_unicode_ci
+      --default-authentication-plugin=mysql_native_password
+    volumes:
+      - mariadb_data:/var/lib/mysql
+
+  rabbitmq:
+    image: 'rabbitmq:latest'
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=G7#rP9@kL4vZ2!mT6^xH8&jQ'
+      - 'RABBITMQ_DEFAULT_USER=wallet_user'
+    ports:
+      - '5672:5672'
+
+#  clean:
+#    image: alpine
+#    volumes:
+#      - ./build:/app/build
+#    command: rm -rf /app/build/libs/*
+
+volumes:
+  mariadb_data:

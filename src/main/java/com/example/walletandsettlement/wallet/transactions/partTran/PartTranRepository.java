@@ -12,6 +12,13 @@ public interface PartTranRepository extends JpaRepository<PartTran, Long> {
   @Query(
       nativeQuery = true,
       value =
-          "SELECT pt.* FROM part_tran pt join tran_header th on th.id = pt.tran_id join wallet w on w.id = pt.wallet_id WHERE verified_date = DATE(:date) and w.walletType = 'CUSTOMER'")
+              """
+                      SELECT pt.*
+                      FROM part_tran pt
+                               join tran_header th on th.id = pt.tran_id
+                               join wallet w on w.id = pt.wallet_id
+                      WHERE DATE(th.verified_date) = DATE(:date)
+                        and w.wallet_type = 'CUSTOMER'
+                      """)
   List<PartTran> findAllCustomerTransactionsByVerifiedDate(Date date);
 }

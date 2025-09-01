@@ -1,10 +1,12 @@
 package com.example.walletandsettlement.wallet.wallet;
 
+import com.example.walletandsettlement.exceptions.InvalidTransactionException;
 import com.example.walletandsettlement.exceptions.NotFoundException;
 import com.example.walletandsettlement.rabbitmq.RabbitMQPublisher;
 import com.example.walletandsettlement.wallet.transactions.partTran.PartTran;
 import com.example.walletandsettlement.wallet.transactions.tranHeader.TranHeader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,10 @@ public class WalletService {
                         .findByWalletName("CASH")
                         .orElseThrow(() -> new NotFoundException("Cash wallet not found"));
 
+        if(!isATopUp && customerWallet.getBalance() < amount){
+            throw new InvalidTransactionException("Not enough balance to perform the withdrawal!");
+        }
+
         PartTran partTran1 =
                 PartTran.builder()
                         .amount(amount)
@@ -35,13 +41,12 @@ public class WalletService {
                         .build();
         PartTran partTran2 =
                 PartTran.builder()
-                        .amount(-amount)
+                        .amount(amount)
                         .tranType(isATopUp ? 'C' : 'D')
                         .wallet(cashWallet)
                         .build();
         TranHeader tranHeader = TranHeader.builder().partTrans(List.of(partTran1, partTran2)).build();
         publisher.send(tranHeader);
-        // todo queue the transaction
         return customerWallet;
     }
 
